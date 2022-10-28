@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/firebase/7.21.1-2020822235757/firebase-app.js"
+      integrity="sha512-xiP+469jwmYUAwLwOd4p1+lD45FJ9dWUlCtQ0lkMyYvWt3xF9ViB2B8OS5Hj5LV9131e1GZzO/u3vZ8DXCklYg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/firebase/7.21.1-2020822235757/firebase-database.min.js"
+      integrity="sha512-9pcV+9tJDsn39SvC/t4Jd8N3k8bt58aYbkL6izei0DKZdR3RPp5HSHC0Up7tSpTIftBQb32zhFCYI4gb3WLvmQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
+      integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
+    <script>
+      const firebaseconfig = {
+        apiKey: "AIzaSyCsaT7Hd1ef4yIpGPpC8y3zZJsicqIV2_Y",
+
+        authDomain: "chat-app-c36ce.firebaseapp.com",
+
+        databaseURL:
+          "https://chat-app-c36ce-default-rtdb.europe-west1.firebasedatabase.app/",
+
+        projectId: "chat-app-c36ce",
+
+        storageBucket: "chat-app-c36ce.appspot.com",
+
+        messagingSenderId: "786370669487",
+
+        appId: "1:786370669487:web:7a9f94a72817c843531d5a",
+      };
+
+      firebase.initializeApp(firebaseconfig);
+
+      db = firebase.database();
+
+      var access = false;
+
+      room = prompt("Room key: ");
+      UID = prompt("UID: ");
+
+      path = db.ref(`${room}/${UID}`);
+      path.once("value", function (snapshot) {
+        if (snapshot.child("Password").exists()) {
+          while (prompt("Password") != snapshot.child("Password").val()) {}
+        } else {
+          db.ref(`${room}/${UID}/Password`).set(prompt("choose password"));
+        }
+      });
+
+      db.ref(`${room}/chat`).on("value", function (snapshot) {
+        document.getElementById("chat").innerHTML = "";
+        snapshot.forEach(function (child) {
+          document.getElementById(
+            "chat"
+          ).innerHTML += `<h1>${child.val()}</h1><br>`;
+        });
+      });
+
+      function f() {
+        db.ref(`${room}/chat`).push(
+          UID + ": " + document.getElementById("in").value
+        );
+        document.getElementById("in").innerHTML = "";
+      }
+    </script>
+    <div id="chat"></div>
+    <form onSubmit="event.preventDefault(); f();">
+      <input id="in" type="text" />
+    </form>
+  </body>
+</html>
